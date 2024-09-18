@@ -1990,11 +1990,76 @@ body {
   }
 }
 
+.button{
+	width: 50px;
+	height: 50px;
+  top:50%;
+  position: fixed;
+	left: 50%;
+	margin-top: -45px;
+	margin-left: -50px;
+	border-radius: 5px;
+	background: none;
+	cursor: pointer;
+	transition: background 0.5s ease;
+}
+.button:hover{
+
+}
+.active#heart:before,.active#heart:after{
+	background: red !important;
+}
+#heart {
+    width: 100px;
+    height: 90px;
+    z-index: 9999999;
+    transition: background 0.5s ease;
+}
+#heart:before,
+#heart:after {
+	transition: background 0.5s ease;
+    position: absolute;
+    content: "";
+    left: 50px;
+    top: 0;
+    width: 50px;
+    height: 80px;
+    background: dimgrey;
+    border-radius: 50px 50px 0 0;
+    transform: rotate(-45deg);
+    transform-origin: 0 100%;
+}
+#heart:after {
+    left: 0;
+    transform: rotate(45deg);
+    transform-origin :100% 100%;
+}
+
+.content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 100;
+  flex-direction: column;
+  z-index: 999999999;
+}
   </style>
 </head>
 <body>
 <!-- partial:index.partial.html -->
 <body class="container">
+  
+  <div class="content">
+    <div id='heart' class='button'></div>
+    <div style="margin-top: 140px; font-size: 2rem;" id="clickaqui">Click aquí</div>
+  </div>  
   <div class="night"></div>
   <div class="flowers">
     <div class="flower flower--1">
@@ -2417,16 +2482,97 @@ body {
         <title>heart22</title>
         <path d="M23.6 2c-3.363 0-6.258 2.736-7.599 5.594-1.342-2.858-4.237-5.594-7.601-5.594-4.637 0-8.4 3.764-8.4 8.401 0 9.433 9.516 11.906 16.001 21.232 6.13-9.268 15.999-12.1 15.999-21.232 0-4.637-3.763-8.401-8.4-8.401z"></path>
       </svg>
+      <audio id="audioPlayer" style="display: none;" controls>
+        <source src="audio.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+      </audio>
 </body>
 <!-- partial -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" type="text/javascript"></script>
+ <script async src="https://cdn.jsdelivr.net/npm/@mojs/core"></script>
   <script>
     onload = () => {
-      document.body.classList.remove("container");
-      const audio = new Audio('audio.mp3');
-      audio.play();
+      // Audio playback script
+      const playButton = document.getElementById('heart');
+      const audioPlayer = document.getElementById('audioPlayer');
+
+      playButton.addEventListener('click', () => {
+        // Play audio when button is clicked
+        audioPlayer.play();
+      });
     };
 
+        $( document ).ready(function() {
+    var scaleCurve = mojs.easing.path('M0,100 L25,99.9999983 C26.2328835,75.0708847 19.7847843,0 100,0');
+      var el = document.querySelector('.button'),
+      // mo.js timeline obj
+      timeline = new mojs.Timeline(),
 
+      // tweens for the animation:
+
+      // burst animation
+      tween1 = new mojs.Burst({
+        parent: el,
+      radius:   { 0: 100 },
+      angle:    { 0: 45 },
+      y: -10,
+      count:    10,
+      radius:       100,
+      children: {
+        shape:        'circle',
+        radius:       30,
+        fill:         [ 'red', 'white' ],
+        strokeWidth:  15,
+        duration:     500,
+      }
+      });
+
+
+      tween2 = new mojs.Tween({
+        duration : 900,
+        onUpdate: function(progress) {
+          var scaleProgress = scaleCurve(progress);
+          el.style.WebkitTransform = el.style.transform = 'scale3d(' + scaleProgress + ',' + scaleProgress + ',1)';
+        }
+      });
+          tween3 = new mojs.Burst({
+        parent: el,
+      radius:   { 0: 100 },
+      angle:    { 0: -45 },
+      y: -10,
+      count:    10,
+      radius:       125,
+      children: {
+        shape:        'circle',
+        radius:       30,
+        fill:         [ 'white', 'red' ],
+        strokeWidth:  15,
+        duration:     400,
+      }
+      });
+
+    // add tweens to timeline:
+    timeline.add(tween1, tween2, tween3);
+
+
+    // when clicking the button start the timeline/animation:
+    $( ".content" ).click(function() {
+      if ($(this).hasClass('active')){
+        $(this).removeClass('active');
+      }else{
+      timeline.play();
+      
+      document.body.classList.remove("container");
+      $(this).addClass('active');
+        setTimeout(() => {
+          $( ".button" ).hide()
+          $( "#clickaqui" ).hide()
+        }, 1000)
+      }
+    });
+
+
+    });
   </script>
 
 </body>
